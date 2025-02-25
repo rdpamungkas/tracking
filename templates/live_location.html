@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+	<meta http-equiv="refresh" content="300">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Location Regu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        /* Animasi teks berjalan */
+        .scroll-text {
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+        }
+        .scroll-text span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scrollText 45s linear infinite;
+        }
+        @keyframes scrollText {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center">Live Location Regu</h2>
+        <div class="text-center">
+            <a href="{{ url_for('live_location') }}" class="btn btn-secondary mb-3">Refresh</a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mb-3">Kembali</a>
+        </div>
+
+        <!-- Peta -->
+        <iframe src="{{ map_path }}" width="100%" height="600px" style="border: none;"></iframe>
+
+        <!-- Running Text di bawah Peta -->
+        <h5 class="mt-4">Data Regu</h5>
+        <div class="scroll-text bg-dark text-white py-2">
+            <span>
+                {% for row in locations %}
+                    <strong>{{ row[0] }}</strong>: {{ row[3] }} &nbsp; | &nbsp;
+                {% endfor %}
+            </span>
+        </div>
+    </div>
+</body>
+</html>
