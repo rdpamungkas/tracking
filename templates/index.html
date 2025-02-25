@@ -1,135 +1,34 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peta Regu Tracker</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head>
-<body>
+{% extends "base.html" %}
 
-    <!-- Navbar dengan tombol Logout -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container d-flex align-items-center">
-        <a class="navbar-brand" href="#">TracKING</a>
-        <div class="ms-auto d-flex align-items-center gap-3">
-            <a href="{{ url_for('live_location') }}" class="btn btn-primary">Lihat Live Location</a>
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
-            {% endif %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Regu Tracking</h2>
+    <form method="POST" action="{{ url_for('dashboard') }}">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="nama_regu" class="form-label">Pilih Regu:</label>
+                <select name="nama_regu" id="nama_regu" class="form-control">
+                    {% for regu in regu_list %}
+                        <option value="{{ regu }}" {% if regu == request.form.get('nama_regu') %} selected {% endif %}>{{ regu }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="shift" class="form-label">Pilih Shift:</label>
+                <select id="shift" class="form-control">
+                    <option value="">Pilih Shift</option>
+                    <option value="1">Shift 1 (08:00 - 16:00)</option>
+                    <option value="2">Shift 2 (16:00 - 00:00)</option>
+                    <option value="3">Shift 3 (00:00 - 08:00)</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="start_time" class="form-label">Dari Tanggal:</label>
+                <input type="datetime-local" id="start_time" name="start_time" class="form-control">
+            </div>
         </div>
-    </div>
-	</nav>
-
-
-    <div class="container mt-4">
-        <h2 class="text-center">Regu Tracking</h2>
-        <form method="POST" action="{{ url_for('dashboard') }}">
-            <div class="container-fluid">
-				<div class="row mb-3">
-					<div class="col-12">
-						<div class="d-flex justify-content-between align-items-center gap-3">
-							<!-- Pilih Regu -->
-							<div class="flex-grow-1">
-								<label for="nama_regu" class="form-label">Pilih Regu:</label>
-								<select name="nama_regu" id="nama_regu" class="form-select w-100">
-									{% for regu in regu_list %}
-										<option value="{{ regu }}" {% if regu == request.form.get('nama_regu') %} selected {% endif %}>{{ regu }}</option>
-									{% endfor %}
-								</select>
-							</div>
-							
-							<!-- Pilih Shift -->
-							<div class="flex-grow-1">
-								<label for="shift" class="form-label">Pilih Shift:</label>
-								<select id="shift" class="form-select w-100">
-									<option value="">Pilih Shift</option>
-									<option value="1">Shift 1 (08:00 - 16:00)</option>
-									<option value="2">Shift 2 (16:00 - 00:00)</option>
-									<option value="3">Shift 3 (00:00 - 08:00)</option>
-								</select>
-							</div>
-
-							<!-- Dari Tanggal -->
-							<div class="flex-grow-1">
-								<label for="start_time" class="form-label">Dari Tanggal:</label>
-								<input type="datetime-local" id="start_time" name="start_time" class="form-control w-100">
-							</div>
-
-							<!-- Sampai Tanggal -->
-							<div class="flex-grow-1">
-								<label for="end_time" class="form-label">Sampai Tanggal:</label>
-								<input type="datetime-local" id="end_time" name="end_time" class="form-control w-100">
-							</div>
-
-							<!-- Tombol Tampilkan -->
-							<div>
-								<button type="submit" class="btn btn-primary mt-4">Tampilkan</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-
-        </form>
-
-        {% if error_message %}
-        <div class="alert alert-danger">{{ error_message }}</div>
-        {% endif %}
-
-        {% if peta %}
-        <iframe src="{{ url_for('static', filename='map.html') }}" width="100%" height="500px"></iframe>
-        {% endif %}
-    </div>
-	
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let startTimeInput = document.getElementById("start_time");
-        let endTimeInput = document.getElementById("end_time");
-        let shiftSelect = document.getElementById("shift");
-
-        // Format tanggal: YYYY-MM-DDTHH:MM
-        function formatDateTime(date, hours, minutes) {
-            let year = date.getFullYear();
-            let month = String(date.getMonth() + 1).padStart(2, '0');
-            let day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-        }
-
-        // Set default waktu ke saat ini
-        let now = new Date();
-        if (!startTimeInput.value) startTimeInput.value = formatDateTime(now, now.getHours(), now.getMinutes());
-        if (!endTimeInput.value) endTimeInput.value = formatDateTime(now, now.getHours(), now.getMinutes());
-
-        // Event listener untuk dropdown shift
-        shiftSelect.addEventListener("change", function () {
-            let now = new Date();
-            let startHour, endHour;
-            
-            if (this.value === "1") {
-                startHour = 8;  endHour = 16;
-            } else if (this.value === "2") {
-                startHour = 16; endHour = 24;
-            } else if (this.value === "3") {
-                startHour = 0;  endHour = 8;
-            } else {
-                return;
-            }
-
-            startTimeInput.value = formatDateTime(now, startHour, 0);
-            
-            if (endHour === 24) {
-                let nextDay = new Date(now);
-                nextDay.setDate(now.getDate() + 1);
-                endTimeInput.value = formatDateTime(nextDay, 0, 0);
-            } else {
-                endTimeInput.value = formatDateTime(now, endHour, 0);
-            }
-        });
-    });
-</script>
-
-
-</body>
-</html>
+    </form>
+</div>
+{% endblock %}
