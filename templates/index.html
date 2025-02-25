@@ -30,15 +30,15 @@
 							</div>
 
 							<!-- Dari Tanggal -->
-							<div class="flex-grow-1">
+							<div class="col-md-3">
 								<label for="start_time" class="form-label">Dari Tanggal:</label>
-								<input type="datetime-local" id="start_time" name="start_time" class="form-control w-100">
+								<input type="datetime-local" id="start_time" name="start_time" class="form-control">
 							</div>
 
 							<!-- Sampai Tanggal -->
-							<div class="flex-grow-1">
+							<div class="col-md-3">
 								<label for="end_time" class="form-label">Sampai Tanggal:</label>
-								<input type="datetime-local" id="end_time" name="end_time" class="form-control w-100">
+								<input type="datetime-local" id="end_time" name="end_time" class="form-control">
 							</div>
 
 							<!-- Tombol Tampilkan -->
@@ -64,50 +64,5 @@
 	
 
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let startTimeInput = document.getElementById("start_time");
-        let endTimeInput = document.getElementById("end_time");
-        let shiftSelect = document.getElementById("shift");
 
-        // Format tanggal: YYYY-MM-DDTHH:MM
-        function formatDateTime(date, hours, minutes) {
-            let year = date.getFullYear();
-            let month = String(date.getMonth() + 1).padStart(2, '0');
-            let day = String(date.getDate()).padStart(2, '0');
-            return ${year}-${month}-${day}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')};
-        }
-
-        // Set default waktu ke saat ini
-        let now = new Date();
-        if (!startTimeInput.value) startTimeInput.value = formatDateTime(now, now.getHours(), now.getMinutes());
-        if (!endTimeInput.value) endTimeInput.value = formatDateTime(now, now.getHours(), now.getMinutes());
-
-        // Event listener untuk dropdown shift
-        shiftSelect.addEventListener("change", function () {
-            let now = new Date();
-            let startHour, endHour;
-            
-            if (this.value === "1") {
-                startHour = 8;  endHour = 16;
-            } else if (this.value === "2") {
-                startHour = 16; endHour = 24;
-            } else if (this.value === "3") {
-                startHour = 0;  endHour = 8;
-            } else {
-                return;
-            }
-
-            startTimeInput.value = formatDateTime(now, startHour, 0);
-            
-            if (endHour === 24) {
-                let nextDay = new Date(now);
-                nextDay.setDate(now.getDate() + 1);
-                endTimeInput.value = formatDateTime(nextDay, 0, 0);
-            } else {
-                endTimeInput.value = formatDateTime(now, endHour, 0);
-            }
-        });
-    });
-</script>
 {% endblock %}
